@@ -1,14 +1,23 @@
 import com.sun.javafx.PlatformUtil;
+
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.Select;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 public class HotelBookingTest {
 
-    WebDriver driver = new ChromeDriver();
+	
+	public WebDriver driver;
+    
 
     @FindBy(linkText = "Hotels")
     private WebElement hotelLink;
@@ -22,20 +31,30 @@ public class HotelBookingTest {
     @FindBy(id = "travellersOnhome")
     private WebElement travellerSelection;
 
+    
+    @BeforeTest
+    public void beforeTest(){
+    	setDriverPath();
+        driver = new ChromeDriver();
+        driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);	
+        driver.get("https://www.cleartrip.com/");
+    }
     @Test
     public void shouldBeAbleToSearchForHotels() {
-        setDriverPath();
-
-        driver.get("https://www.cleartrip.com/");
+        
+        PageFactory.initElements(driver, this);
         hotelLink.click();
-
+        PageFactory.initElements(driver, this);
+        localityTextBox.click();
         localityTextBox.sendKeys("Indiranagar, Bangalore");
 
         new Select(travellerSelection).selectByVisibleText("1 room, 2 adults");
         searchButton.click();
-
-        driver.quit();
-
+    }
+    
+    @AfterTest
+    public void afterTest(){
+    	driver.quit();
     }
 
     private void setDriverPath() {
